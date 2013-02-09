@@ -8,11 +8,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class MySimpleArrayAdapter extends ArrayAdapter<String> {
+public class RosterArrayAdapter extends ArrayAdapter<String> {
   private final Context context;
   private String[] values;
 
-  public MySimpleArrayAdapter(Context context, String[] values) {
+  public RosterArrayAdapter(Context context, String[] values) {
     super(context, R.layout.rowlayout, values);
     this.context = context;
     this.values = values;

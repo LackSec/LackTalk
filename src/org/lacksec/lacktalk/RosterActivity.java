@@ -18,7 +18,7 @@ public class RosterActivity extends Activity{
 	public static String LOG_TAG = RosterActivity.class.getName();
 	
 	String[] values = {"gosd","sdasdo,asd:","qwe,w"};
-	MySimpleArrayAdapter adapter; 
+	RosterArrayAdapter adapter; 
 	
 	Context context;
 	public void onCreate(Bundle savedInstanceState)
@@ -32,7 +32,7 @@ public class RosterActivity extends Activity{
 				new IntentFilter(Constants.INTENT_ROSTER_UPDATE));
 
 		
-		adapter =  new MySimpleArrayAdapter(this, values);
+		adapter =  new RosterArrayAdapter(this, values);
 		
 		
 	       ListView list1 = (ListView) findViewById(R.id.rosterList);

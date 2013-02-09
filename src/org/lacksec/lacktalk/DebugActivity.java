@@ -27,9 +27,11 @@ public class DebugActivity extends Activity {
 	public static final String LOG_TAG = DebugActivity.class.getName();
 	
 	// Until Accounts are tied in use Hardcoded values for testing
+	static final String LOGIN_USERNAME = "jazz.bot.test@gmail.com";
+	static final String LOGIN_PASSWORD = "jazz_dev";
 	
-	static final String LOGIN_USERNAME = "user@provider.com";
-	static final String LOGIN_PASSWORD = "secret";
+	//static final String LOGIN_USERNAME = "user@provider.com";
+	//static final String LOGIN_PASSWORD = "secret";
 	
 
 	private CommunicationEngine commEngine = null;
