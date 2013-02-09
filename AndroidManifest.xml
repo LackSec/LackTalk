@@ -23,6 +23,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+         <activity
+            android:name="org.lacksec.lacktalk.RosterActivity"
+            android:label="Roster" >
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
          <service android:name="CommunicationEngine" >
         </service>
     </application>

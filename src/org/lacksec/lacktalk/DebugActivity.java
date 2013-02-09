@@ -4,6 +4,7 @@ package org.lacksec.lacktalk;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.app.Activity;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +14,10 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
+
 
 
 
@@ -23,6 +27,7 @@ public class DebugActivity extends Activity {
 	public static final String LOG_TAG = DebugActivity.class.getName();
 	
 	// Until Accounts are tied in use Hardcoded values for testing
+	
 	static final String LOGIN_USERNAME = "user@provider.com";
 	static final String LOGIN_PASSWORD = "secret";
 	
@@ -49,7 +54,6 @@ public class DebugActivity extends Activity {
         this.startService(service);
 		getApplicationContext().bindService(service, commEngineConnection, 0);
 		
-		
 		final Button connectButton = (Button) findViewById(R.id.button1);
         connectButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -58,6 +62,16 @@ public class DebugActivity extends Activity {
                 connectRequest.putExtra("username", LOGIN_USERNAME);
                 connectRequest.putExtra("password", LOGIN_PASSWORD);
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(connectRequest);
+            }
+        });
+        
+        final Button rosterButton = (Button) findViewById(R.id.rosterButton);
+        rosterButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+            	Log.v(LOG_TAG,"Roster start");
+            	Intent i = new Intent(getApplicationContext(), RosterActivity.class);  
+            	startActivity(i);
+            	Log.v(LOG_TAG,"Roster End");
             }
         });
         

@@ -31,6 +31,8 @@ import android.util.Log;
 import org.lacksec.lacktalk.Constants;
 
 
+
+
 public class CommunicationEngine extends Service implements MessageListener {
 	public static final String LOG_TAG = CommunicationEngine.class.getName();
 	public static ConnectionConfiguration gtalkConnectionConfiguration = new ConnectionConfiguration("talk.google.com",5222, "gmail.com");
@@ -38,13 +40,15 @@ public class CommunicationEngine extends Service implements MessageListener {
 	XMPPConnection connection;
 	Thread messageHandler;
 	
-	 private final IBinder mBinder = new getBinder();
-	    public class getBinder extends Binder {
-	        CommunicationEngine getService() {
-	            return CommunicationEngine.this;
-	        }
-	    }
-	
+	boolean isConnected = false;
+
+	private final IBinder mBinder = new getBinder();
+	public class getBinder extends Binder {
+		CommunicationEngine getService() {
+			return CommunicationEngine.this;
+		}
+	}
+
 
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -54,7 +58,9 @@ public class CommunicationEngine extends Service implements MessageListener {
 
 	public void onCreate() {
 		LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(connectRequestReceiver,
-			      new IntentFilter("android.intent.action.login"));
+				new IntentFilter("android.intent.action.login"));
+		LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(rosterRequestReceiver,
+				new IntentFilter(Constants.INTENT_ROSTER_REQUEST));
 
 		Log.v(LOG_TAG,"Created");
 	}
@@ -76,7 +82,7 @@ public class CommunicationEngine extends Service implements MessageListener {
 		Thread t = new Thread(new Runnable() {
 			public void run() {
 				LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(sendRequestReceiver,
-					      new IntentFilter("android.intent.action.SendMsg"));
+						new IntentFilter("android.intent.action.SendMsg"));
 				messageHandlerLoop();
 			}
 		});
@@ -92,7 +98,7 @@ public class CommunicationEngine extends Service implements MessageListener {
 	private void messageHandlerLoop()
 	{
 		PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
-		
+
 		// Collect these messages
 		PacketCollector collector = connection.createPacketCollector(filter);
 		while(true) {
@@ -102,20 +108,20 @@ public class CommunicationEngine extends Service implements MessageListener {
 				Log.v(LOG_TAG, "RAWMSG:" +msg.getFrom() + "::" + msg.getBody());
 				ChatMessageObject CMO = parseMessage(msg);
 				broadcastMessage(CMO);
-				
+
 			}
 		}
 	}
-	
-    public void processMessage(Chat chat, Message message)
-    {
-    	if(message.getType() == Message.Type.chat)
-    	{
-    		Log.v(LOG_TAG,chat.getParticipant() + " says: " + message.getBody());
-    		ChatMessageObject CMO = parseMessage(message);
-    	}
-    }
-	
+
+	public void processMessage(Chat chat, Message message)
+	{
+		if(message.getType() == Message.Type.chat)
+		{
+			Log.v(LOG_TAG,chat.getParticipant() + " says: " + message.getBody());
+			ChatMessageObject CMO = parseMessage(message);
+		}
+	}
+
 	/**
 	 * Translates Library Message Object to Internal Message Representation.
 	 * @param msg
@@ -127,46 +133,48 @@ public class CommunicationEngine extends Service implements MessageListener {
 		CMO.sender	= msg.getFrom();
 		CMO.timestamp = System.currentTimeMillis();      // TODO: Epochtimestamp Will this suffice, is there a better option?
 		CMO.message = msg.getBody();
-		
+
 		return CMO;
 	}
 
-	
+
 	private boolean broadcastMessage(ChatMessageObject messageObject){
-		
+
 		Intent newChatMessageIntent = new Intent(Constants.INTENT_CHATMSG_SEND);
 		newChatMessageIntent.putExtra("ChatMessageObject", messageObject);
 		LocalBroadcastManager.getInstance(getApplicationContext());
 		return false;
 	}
-	
-	
+
+
 	/**
 	 * Uglyness to Get Network Off The UI Thread.
 	 */
 	class ConnectGTalkTask extends AsyncTask<String, Void, Boolean> {
 
-	    protected Boolean doInBackground(String... params) {
-	    	Log.v(LOG_TAG,">"+params[0] +" % " +params[1]+"<");
-	    	return connectToXMPPService(gtalkConnectionConfiguration, params[0], params[1]) ;
-	        
-	    }
+		protected Boolean doInBackground(String... params) {
+			Log.v(LOG_TAG,">"+params[0] +" % " +params[1]+"<");
+			return connectToXMPPService(gtalkConnectionConfiguration, params[0], params[1]) ;
 
-	    protected void onPostExecute(Boolean b) {
-	    	Intent responseIntent;
-	    	if(b){
-  	    		responseIntent = new Intent(Constants.INTENT_CONNECT_SUCCEEDED);
-  	    		messageHandler = startHandlerLoop();								// TODO: Find better place to start HandlerLoop / Get Rid Of handler Loop cuze its stupid
-  	    	}else{
-  	    		responseIntent = new Intent(Constants.INTENT_CONNECT_FAILED);
-  	    	}
-  	    	
-		
-  	    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(responseIntent);
-	    }
-	 }
+		}
 
-	
+		protected void onPostExecute(Boolean b) {
+			Intent responseIntent;
+			if(b){
+				responseIntent = new Intent(Constants.INTENT_CONNECT_SUCCEEDED);
+				isConnected = true;
+				messageHandler = startHandlerLoop();								// TODO: Find better place to start HandlerLoop / Get Rid Of handler Loop cuze its stupid
+			}else{
+				isConnected = false;
+				responseIntent = new Intent(Constants.INTENT_CONNECT_FAILED);
+			}
+
+
+			LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(responseIntent);
+		}
+	}
+
+
 	/**
 	 * Establishes Connection to XMPP transport Service.
 	 * TODO: Secure Way to pass passwords?
@@ -175,8 +183,8 @@ public class CommunicationEngine extends Service implements MessageListener {
 	 * @param password
 	 * @return
 	 */
-	
-	 //new RetreiveFeedTask().execute(urlToRssFeed);
+
+	//new RetreiveFeedTask().execute(urlToRssFeed);
 	public boolean connectToXMPPService(ConnectionConfiguration config, String username, String password) 
 	{
 
@@ -196,50 +204,71 @@ public class CommunicationEngine extends Service implements MessageListener {
 
 		}
 	}
-	
-	 public void sendMessage(String message, String to) throws XMPPException
-	    {
-		 Log.v(LOG_TAG,"Message out (To: " + to + " Message: " + message + ")");
-	    Chat chat = connection.getChatManager().createChat(to, this);
-	    chat.sendMessage(message);
-	    }
-	
+
+	public void sendMessage(String message, String to) throws XMPPException
+	{
+		Log.v(LOG_TAG,"Message out (To: " + to + " Message: " + message + ")");
+		Chat chat = connection.getChatManager().createChat(to, this);
+		chat.sendMessage(message);
+	}
+
 	private BroadcastReceiver sendRequestReceiver = new BroadcastReceiver() {
-	  	  @Override
-	  	  public void onReceive(Context context, Intent intent) {
-	  	    // Get extra data included in the Intent
-	  		  Log.d(LOG_TAG,"enter Recieve");
-	  	    try {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			// Get extra data included in the Intent
+			Log.d(LOG_TAG,"enter Recieve");
+			try {
 				sendMessage(intent.getExtras().getString("message"),intent.getExtras().getString("recipient"));
 			} catch (XMPPException e) {
 				// TODO Auto-generated catch block
 				Log.e(LOG_TAG,e.getMessage());
 			}
-	  	  }
-	  	};
-	  	
-		private BroadcastReceiver connectRequestReceiver = new BroadcastReceiver() {
-		  	  @Override
-		  	  public void onReceive(Context context, Intent intent) {
-		  		  new ConnectGTalkTask().execute(intent.getStringExtra("username"),intent.getStringExtra("password"));
-		  	  }
-		  	};
-	  	
-	   
-	 
-	    public String displayBuddyList()
-	    {
-	    Roster roster = connection.getRoster();
-	    Collection<RosterEntry> entries = roster.getEntries();
-//	 
-//	    System.out.println("\n\n" + entries.size() + " buddy(ies):");
-//	    for(RosterEntry r:entries)
-//	    {
-//	    System.out.println(r.getUser());
-//	    }
-	    return "ROSTER";
-	    }
-	
-	
+		}
+	};
+
+	private BroadcastReceiver connectRequestReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			new ConnectGTalkTask().execute(intent.getStringExtra("username"),intent.getStringExtra("password"));
+		}
+	};
+
+	private BroadcastReceiver rosterRequestReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Log.v(LOG_TAG,"Frist Reciev Rosters");
+			broadcastRoster();
+		}
+	};
+
+
+
+	public boolean broadcastRoster()
+	{
+		// IF not connected Escape early + notify system
+		// Logic should really be abstracted out into state pattern.
+		if(false == isConnected){ 
+			LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.INTENT_NOT_CONNECTED)); 
+			return false;
+		}
+		
+		Roster roster = connection.getRoster();
+		Collection<RosterEntry> entries = roster.getEntries();
+
+		String[] contacts = new String[entries.size()];
+		String  s = "\n\n" + entries.size() + " buddy(ies):";
+		int _index =0;
+		for(RosterEntry r:entries)
+		{
+			contacts[_index++] = r.getUser();
+		}
+		Log.v(LOG_TAG,s+ contacts.toString());
+		Intent i = new Intent(Constants.INTENT_ROSTER_UPDATE);
+		i.putExtra("roster", contacts);
+		LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
+		return true;
+	}
+
+
 
 }
