@@ -23,8 +23,14 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <service android:name="CommunicationEngine">
-        </service>
+
+        <activity android:name="org.lacksec.lacktalk.activity.AddUserActivity" android:label="Add User">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+            </intent-filter>
+        </activity>
+
+        <service android:name="CommunicationEngine"/>
     </application>
 
 
