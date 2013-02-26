@@ -23,5 +23,4 @@ public class NfcUtilsTest extends AndroidTestCase {
 		// Compare
 		Assert.assertTrue(Arrays.equals(message.getBytes(), payload));
 	}
-
 }
