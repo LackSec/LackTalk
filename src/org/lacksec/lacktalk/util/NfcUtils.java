@@ -22,7 +22,7 @@ public class NfcUtils {
 		return ndefMessage;
 	}
 
-	private static NdefRecord createNdefRecord(String message) {
+	public static NdefRecord createNdefRecord(String message) {
 		byte[] textBytes = message.getBytes();
 		NdefRecord recordNFC = new NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_TEXT, new byte[0], textBytes);
 		return recordNFC;
