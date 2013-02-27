@@ -10,6 +10,7 @@ import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
+import org.lacksec.lacktalk.R;
 import org.lacksec.lacktalk.RosterActivity;
 import org.lacksec.lacktalk.util.NfcUtils;
 
@@ -30,6 +31,8 @@ public class AddUserActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		Log.v(LOG_TAG, "onCreate - begin");
 		super.onCreate(savedInstanceState);
+
+		setContentView(R.layout.add_user);
 
 		mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 		mNfcPendingIntent = PendingIntent.getActivity(this, 0,
@@ -68,6 +71,7 @@ public class AddUserActivity extends Activity {
 			NdefMessage[] msgs = NfcUtils.getNdefMessages(intent);
 			NdefRecord ndefRecord = msgs[0].getRecords()[0];
 			String msg = new String(ndefRecord.getPayload());
+			// TODO Have this do something
 			Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
 		}
 	}

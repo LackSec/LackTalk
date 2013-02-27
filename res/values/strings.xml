@@ -5,4 +5,9 @@
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
 
+
+    <!-- Add User -->
+    <string name="title_add_user">Add User</string>
+
+
 </resources>
