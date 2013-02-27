@@ -35,7 +35,7 @@ import org.lacksec.lacktalk.util.NfcUtils;
  * Time: 23:31
  */
 public class AddUserActivity extends Activity {
-	public static String LOG_TAG = RosterActivity.class.getName();
+	public static String LOG_TAG = RosterActivity.class.getSimpleName();
 
 	NfcAdapter mNfcAdapter;
 	PendingIntent mNfcPendingIntent;
