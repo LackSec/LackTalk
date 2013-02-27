@@ -8,7 +8,9 @@ import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
+import org.lacksec.lacktalk.RosterActivity;
 import org.lacksec.lacktalk.util.NfcUtils;
 
 /**
@@ -18,12 +20,15 @@ import org.lacksec.lacktalk.util.NfcUtils;
  * Time: 23:31
  */
 public class AddUserActivity extends Activity {
+	public static String LOG_TAG = RosterActivity.class.getName();
+
 	NfcAdapter mNfcAdapter;
 	PendingIntent mNfcPendingIntent;
 	IntentFilter[] mNdefExchangeFilters;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		Log.v(LOG_TAG, "onCreate - begin");
 		super.onCreate(savedInstanceState);
 
 		mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -40,14 +45,16 @@ public class AddUserActivity extends Activity {
 
 	@Override
 	protected void onResume() {
+		Log.v(LOG_TAG, "onResume - begin");
 		super.onResume();
 
-		mNfcAdapter.enableForegroundNdefPush(AddUserActivity.this, NfcUtils.getNdef());
+		mNfcAdapter.enableForegroundNdefPush(AddUserActivity.this, NfcUtils.getNdefMessage());
 		mNfcAdapter.enableForegroundDispatch(this, mNfcPendingIntent, mNdefExchangeFilters, null);
 	}
 
 	@Override
 	protected void onPause() {
+		Log.v(LOG_TAG, "onPause - begin");
 		super.onPause();
 
 		mNfcAdapter.disableForegroundNdefPush(this);
@@ -56,11 +63,12 @@ public class AddUserActivity extends Activity {
 
 	@Override
 	protected void onNewIntent(Intent intent) {
+		Log.v(LOG_TAG, "onNewIntent - begin");
 		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
 			NdefMessage[] msgs = NfcUtils.getNdefMessages(intent);
 			NdefRecord ndefRecord = msgs[0].getRecords()[0];
 			String msg = new String(ndefRecord.getPayload());
-			Toast.makeText(this, msg.toString(), Toast.LENGTH_LONG).show();
+			Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
 		}
 	}
 }

@@ -14,21 +14,22 @@ import android.util.Log;
  * Time: 23:44
  */
 public class NfcUtils {
-	public static final String TAG = NfcUtils.class.getSimpleName();
+	public static final String LOG_TAG = NfcUtils.class.getSimpleName();
 
-	public static NdefMessage getNdef() {
+	public static NdefMessage getNdefMessage() {
+		Log.v(LOG_TAG, "getNdefMessage - begin");
 		NdefRecord[] ndefRecords = {createNdefRecord("Hello World")};
-		NdefMessage ndefMessage = new NdefMessage(ndefRecords);
-		return ndefMessage;
+		return new NdefMessage(ndefRecords);
 	}
 
 	public static NdefRecord createNdefRecord(String message) {
+		Log.v(LOG_TAG, "createNdefRecord - begin");
 		byte[] textBytes = message.getBytes();
-		NdefRecord recordNFC = new NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_TEXT, new byte[0], textBytes);
-		return recordNFC;
+		return new NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_TEXT, new byte[0], textBytes);
 	}
 
 	public static NdefMessage[] getNdefMessages(Intent intent) {
+		Log.v(LOG_TAG, "getNdefMessages - begin");
 		// Parse the intent
 		NdefMessage[] msgs = null;
 		String action = intent.getAction();
@@ -47,7 +48,7 @@ public class NfcUtils {
 				msgs = new NdefMessage[]{msg};
 			}
 		} else {
-			Log.d(TAG, "Unknown intent.");
+			Log.d(LOG_TAG, "Unknown intent.");
 		}
 		return msgs;
 	}
