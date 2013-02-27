@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2013.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Don't be a Duck Public License v1.0.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the Don't be a Duck Public License
+ * along with this program. If not, just don't be a duck.
+ */
+
 package org.lacksec.lacktalk.util;
 
 import android.content.Intent;
