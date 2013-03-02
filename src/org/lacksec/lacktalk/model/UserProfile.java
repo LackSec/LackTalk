@@ -12,30 +12,35 @@
  * along with this program. If not, just don't be a duck.
  */
 
-package org.lacksec.lacktalk.util;
+package org.lacksec.lacktalk.model;
 
-import android.util.Log;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
 /**
  * Creation info:
  * User: darndt
- * Date: 2013/02/27
- * Time: 15:20
+ * Date: 2013/03/02
+ * Time: 16:42
  */
-public class UserProfileUtils {
-	private static final String LOG_TAG = UserProfileUtils.class.getName();
+@DatabaseTable(tableName = "user_profile")
+public class UserProfile {
 
-	public static String getUserId() {
-		Log.v(LOG_TAG, "getUserId - begin");
+	@DatabaseField(id = true)
+	private String userId;
 
-		// TODO Finish this stub
-		return "USER_ID";
+	public UserProfile() {
 	}
 
-	public static String getPublicKey() {
-		Log.v(LOG_TAG, "getPublicKey - begin");
+	public UserProfile(String userId) {
+		this.userId = userId;
+	}
 
-		// TODO Finish this stub
-		return "PUBLIC_KEY";
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 }

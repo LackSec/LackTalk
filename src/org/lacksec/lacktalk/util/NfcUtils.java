@@ -28,23 +28,26 @@ import android.util.Log;
  * Time: 23:44
  */
 public class NfcUtils {
-	private static final String LOG_TAG = NfcUtils.class.getSimpleName();
+	private static final String LOG_TAG = NfcUtils.class.getName();
 	public static final String NFC_DATA_TYPE = "text/plain";
 
 	public static NdefMessage getNdefMessage(String userId, String privateKey) {
 		Log.v(LOG_TAG, "getNdefMessage - begin");
+
 		NdefRecord[] ndefRecords = {createNdefRecord(userId + ":" + privateKey)};
 		return new NdefMessage(ndefRecords);
 	}
 
 	public static NdefRecord createNdefRecord(String message) {
 		Log.v(LOG_TAG, "createNdefRecord - begin");
+
 		byte[] textBytes = message.getBytes();
 		return new NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_TEXT, new byte[0], textBytes);
 	}
 
 	public static NdefMessage[] getNdefMessages(Intent intent) {
 		Log.v(LOG_TAG, "getNdefMessages - begin");
+
 		// Parse the intent
 		NdefMessage[] msgs = null;
 		String action = intent.getAction();

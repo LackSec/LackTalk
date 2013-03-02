@@ -14,7 +14,6 @@
 
 package org.lacksec.lacktalk.activity;
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -24,8 +23,12 @@ import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
+import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
+import com.j256.ormlite.dao.RuntimeExceptionDao;
 import org.lacksec.lacktalk.R;
 import org.lacksec.lacktalk.RosterActivity;
+import org.lacksec.lacktalk.data.DatabaseHelper;
+import org.lacksec.lacktalk.model.UserProfile;
 import org.lacksec.lacktalk.util.NfcUtils;
 import org.lacksec.lacktalk.util.UserProfileUtils;
 
@@ -35,12 +38,13 @@ import org.lacksec.lacktalk.util.UserProfileUtils;
  * Date: 2013/02/23
  * Time: 23:31
  */
-public class AddUserActivity extends Activity {
-	private static String LOG_TAG = RosterActivity.class.getSimpleName();
+public class AddUserActivity extends OrmLiteBaseActivity<DatabaseHelper> {
+	private static String LOG_TAG = RosterActivity.class.getName();
 
 	NfcAdapter mNfcAdapter;
 	PendingIntent mNfcPendingIntent;
 	IntentFilter[] mNdefExchangeFilters;
+	private RuntimeExceptionDao<UserProfile, String> mUserProfileDao;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,17 +52,8 @@ public class AddUserActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.add_user);
-
-		mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-		mNfcPendingIntent = PendingIntent.getActivity(this, 0,
-				new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-		IntentFilter ndefDetected = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
-		try {
-			ndefDetected.addDataType(NfcUtils.NFC_DATA_TYPE);
-		} catch (IntentFilter.MalformedMimeTypeException e) {
-			throw new RuntimeException(e.getMessage());
-		}
-		mNdefExchangeFilters = new IntentFilter[]{ndefDetected};
+		setUpNfc();
+		setUpDaos();
 	}
 
 	@Override
@@ -83,6 +78,8 @@ public class AddUserActivity extends Activity {
 	@Override
 	protected void onNewIntent(Intent intent) {
 		Log.v(LOG_TAG, "onNewIntent - begin");
+		super.onNewIntent(intent);
+
 		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
 			NdefMessage[] msgs = NfcUtils.getNdefMessages(intent);
 			NdefRecord ndefRecord = msgs[0].getRecords()[0];
@@ -90,5 +87,26 @@ public class AddUserActivity extends Activity {
 			// TODO Have this do something
 			Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
 		}
+	}
+
+	private void setUpNfc() {
+		Log.v(LOG_TAG, "setUpNfc - begin");
+
+		mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+		mNfcPendingIntent = PendingIntent.getActivity(this, 0,
+				new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+		IntentFilter ndefDetected = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
+		try {
+			ndefDetected.addDataType(NfcUtils.NFC_DATA_TYPE);
+		} catch (IntentFilter.MalformedMimeTypeException e) {
+			throw new RuntimeException(e);
+		}
+		mNdefExchangeFilters = new IntentFilter[]{ndefDetected};
+	}
+
+	private void setUpDaos() {
+		Log.v(LOG_TAG, "setUpDaos - begin");
+
+		mUserProfileDao = getHelper().getUserProfileDao();
 	}
 }
