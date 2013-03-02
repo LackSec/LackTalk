@@ -28,11 +28,12 @@ import android.util.Log;
  * Time: 23:44
  */
 public class NfcUtils {
-	public static final String LOG_TAG = NfcUtils.class.getSimpleName();
+	private static final String LOG_TAG = NfcUtils.class.getSimpleName();
+	public static final String NFC_DATA_TYPE = "text/plain";
 
-	public static NdefMessage getNdefMessage() {
+	public static NdefMessage getNdefMessage(String userId, String privateKey) {
 		Log.v(LOG_TAG, "getNdefMessage - begin");
-		NdefRecord[] ndefRecords = {createNdefRecord("Hello World")};
+		NdefRecord[] ndefRecords = {createNdefRecord(userId + ":" + privateKey)};
 		return new NdefMessage(ndefRecords);
 	}
 

@@ -27,6 +27,7 @@ import android.widget.Toast;
 import org.lacksec.lacktalk.R;
 import org.lacksec.lacktalk.RosterActivity;
 import org.lacksec.lacktalk.util.NfcUtils;
+import org.lacksec.lacktalk.util.UserProfileUtils;
 
 /**
  * Creation info:
@@ -35,7 +36,7 @@ import org.lacksec.lacktalk.util.NfcUtils;
  * Time: 23:31
  */
 public class AddUserActivity extends Activity {
-	public static String LOG_TAG = RosterActivity.class.getSimpleName();
+	private static String LOG_TAG = RosterActivity.class.getSimpleName();
 
 	NfcAdapter mNfcAdapter;
 	PendingIntent mNfcPendingIntent;
@@ -53,9 +54,9 @@ public class AddUserActivity extends Activity {
 				new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 		IntentFilter ndefDetected = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
 		try {
-			ndefDetected.addDataType("text/plain");
+			ndefDetected.addDataType(NfcUtils.NFC_DATA_TYPE);
 		} catch (IntentFilter.MalformedMimeTypeException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e.getMessage());
 		}
 		mNdefExchangeFilters = new IntentFilter[]{ndefDetected};
 	}
@@ -65,7 +66,8 @@ public class AddUserActivity extends Activity {
 		Log.v(LOG_TAG, "onResume - begin");
 		super.onResume();
 
-		mNfcAdapter.enableForegroundNdefPush(AddUserActivity.this, NfcUtils.getNdefMessage());
+		mNfcAdapter.enableForegroundNdefPush(AddUserActivity.this,
+				NfcUtils.getNdefMessage(UserProfileUtils.getUserId(), UserProfileUtils.getPublicKey()));
 		mNfcAdapter.enableForegroundDispatch(this, mNfcPendingIntent, mNdefExchangeFilters, null);
 	}
 
