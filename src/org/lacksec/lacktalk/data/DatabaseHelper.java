@@ -48,6 +48,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 			Log.e(DatabaseHelper.class.getName(), "Cannot create database", e);
 			throw new RuntimeException(e);
 		}
+		UserProfile user = new UserProfile("systemuser");
+		getUserProfileDao().create(user);
 	}
 
 	@Override

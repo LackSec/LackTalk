@@ -30,7 +30,6 @@ import org.lacksec.lacktalk.RosterActivity;
 import org.lacksec.lacktalk.data.DatabaseHelper;
 import org.lacksec.lacktalk.model.UserProfile;
 import org.lacksec.lacktalk.util.NfcUtils;
-import org.lacksec.lacktalk.util.UserProfileUtils;
 
 /**
  * Creation info:
@@ -61,8 +60,10 @@ public class AddUserActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 		Log.v(LOG_TAG, "onResume - begin");
 		super.onResume();
 
+		UserProfile userProfile = mUserProfileDao.queryForId("systemuser");
+
 		mNfcAdapter.enableForegroundNdefPush(AddUserActivity.this,
-				NfcUtils.getNdefMessage(UserProfileUtils.getUserId(), UserProfileUtils.getPublicKey()));
+				NfcUtils.getNdefMessage(userProfile.getUserId(), userProfile.getUserId()));
 		mNfcAdapter.enableForegroundDispatch(this, mNfcPendingIntent, mNdefExchangeFilters, null);
 	}
 
