@@ -25,6 +25,7 @@ import android.util.Log;
 import android.widget.Toast;
 import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
+import org.lacksec.lacktalk.Constants;
 import org.lacksec.lacktalk.R;
 import org.lacksec.lacktalk.RosterActivity;
 import org.lacksec.lacktalk.data.DatabaseHelper;
@@ -60,7 +61,7 @@ public class AddUserActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 		Log.v(LOG_TAG, "onResume - begin");
 		super.onResume();
 
-		UserProfile userProfile = mUserProfileDao.queryForId("systemuser");
+		UserProfile userProfile = mUserProfileDao.queryForId(Constants.SYSTEM_USER_ID);
 
 		mNfcAdapter.enableForegroundNdefPush(AddUserActivity.this,
 				NfcUtils.getNdefMessage(userProfile.getUserId(), userProfile.getUserId()));
